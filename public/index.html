@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Atelier Artă CNRV • Portal Lecții</title>
+<link rel="icon" type="image/png" href="/logo-cnrv.png">
+<style>
+:root {
+  --bg: #F8F9FA;
+  --surface: #FFFFFF;
+  --text: #1A1A1A;
+  --blue: #2B5D8A;
+  --terracotta: #D94F2B;
+  --green: #3A7D44;
+  --border: #E0E0E0;
+  --shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', Roboto, sans-serif; overflow: hidden; }
+body { display: flex; flex-direction: column; }
+
+header {
+  background: var(--surface);
+  padding: 15px 30px;
+  border-bottom: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 100;
+}
+.logo-area { display: flex; align-items: center; gap: 15px; }
+.logo-area img { height: 50px; }
+.logo-area h1 { margin: 0; font-size: 24px; color: var(--blue); }
+
+.main-nav {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+.card {
+  background: var(--surface);
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  border: 3px solid transparent;
+  min-height: 200px;
+}
+.card:active { transform: scale(0.96); box-shadow: none; }
+.card.class { border-color: var(--blue); }
+.card.app { border-color: var(--terracotta); }
+.card h2 { margin: 10px 0 0; font-size: 32px; }
+.card p { margin: 5px 0 0; color: #666; font-weight: 500; }
+.card .icon { font-size: 50px; }
+
+.app-overlay {
+  position: fixed; inset: 0; background: var(--bg); z-index: 200;
+  display: none; flex-direction: column;
+}
+.app-header {
+  padding: 15px 30px; background: white; border-bottom: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.app-content { flex: 1; position: relative; overflow: hidden; }
+.close-btn { 
+  background: #eee; border-radius: 50%; width: 50px; height: 50px; 
+  display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer;
+}
+
+/* Specific App Styles */
+.canvas-container { width: 100%; height: 100%; background: white; touch-action: none; position: relative; }
+canvas { width: 100%; height: 100%; display: block; }
+.controls {
+  position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: rgba(255,255,255,0.9); padding: 15px; border-radius: 20px;
+  box-shadow: var(--shadow); display: flex; gap: 15px; align-items: center;
+}
+.btn { 
+  padding: 15px 25px; border-radius: 12px; border: none; background: var(--blue); 
+  color: white; font-weight: bold; font-size: 18px; cursor: pointer;
+}
+.btn.red { background: var(--terracotta); }
+.btn.green { background: var(--green); }
+
+/* Color Theory Grid */
+.color-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 40px; height: 100%; }
+.color-swatch { border-radius: 20px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-area">
+    <img src="/logo-cnrv.png" alt="CNRV">
+    <h1>Atelier Artă • CNRV</h1>
+  </div>
+  <div style="font-weight: bold; color: #666;">MOD TABLĂ ACTIV</div>
+</header>
+
+<div class="main-nav">
+  <!-- Clasele -->
+  <div class="card class" onclick="openClass('V')">
+    <div class="icon">🎨</div>
+    <h2>Clasa V</h2>
+    <p>Punct, Linie, Culoare</p>
+  </div>
+  <div class="card class" onclick="openClass('VI')">
+    <div class="icon">📐</div>
+    <h2>Clasa VI</h2>
+    <p>Spațiu, Compoziție, Ritm</p>
+  </div>
+  <div class="card class" onclick="openClass('VII')">
+    <div class="icon">🏛️</div>
+    <h2>Clasa VII</h2>
+    <p>Perspectivă, Proporții</p>
+  </div>
+  <div class="card class" onclick="openClass('VIII')">
+    <div class="icon">⏳</div>
+    <h2>Clasa VIII</h2>
+    <p>Istoria Artei, Patrimoniu</p>
+  </div>
+  <div class="card class" onclick="openClass('IX')">
+    <div class="icon">👁️</div>
+    <h2>Clasa IX</h2>
+    <p>Analiză Vizuală, Imagine</p>
+  </div>
+  <div class="card class" onclick="openClass('X')">
+    <div class="icon">✍️</div>
+    <h2>Clasa X</h2>
+    <p>Critică, Design, Arhitectură</p>
+  </div>
+
+  <!-- Aplicații Extra -->
+  <div class="card app" onclick="openApp('perspective')">
+    <div class="icon">🛣️</div>
+    <h2>Perspectivă</h2>
+    <p>Punct de fugă & Orizont</p>
+  </div>
+  <div class="card app" onclick="openApp('signs')">
+    <div class="icon">✏️</div>
+    <h2>Semne Grafice</h2>
+    <p>Exerciții de limbaj</p>
+  </div>
+  <div class="card app" onclick="openApp('colors')">
+    <div class="icon">🌈</div>
+    <h2>Teoria Culorii</h2>
+    <p>Mixer & Complementare</p>
+  </div>
+</div>
+
+<!-- App Overlay -->
+<div id="appOverlay" class="app-overlay">
+  <div class="app-header">
+    <h2 id="appTitle">Aplicație</h2>
+    <div class="close-btn" onclick="closeApp()">✕</div>
+  </div>
+  <div class="app-content" id="appContent">
+    <!-- Content injected by JS -->
+  </div>
+</div>
+
+<script>
+function openClass(cls) {
+  // Pentru moment, redirectăm către secțiunea din portalul existent sau afișăm un mesaj
+  alert("Deschidere lecții Clasa " + cls + "...");
+}
+
+function openApp(appId) {
+  const overlay = document.getElementById('appOverlay');
+  const title = document.getElementById('appTitle');
+  const content = document.getElementById('appContent');
+  overlay.style.display = 'flex';
+
+  if (appId === 'perspective') {
+    title.textContent = "Perspectivă la un punct de fugă";
+    content.innerHTML = `
+      <div class="canvas-container">
+        <canvas id="pCanvas"></canvas>
+        <div class="controls">
+          <button class="btn" onclick="resetPersp()">Resetează</button>
+          <span style="font-weight:bold">Trage de punctul roșu pe tablă</span>
+        </div>
+      </div>
+    `;
+    initPerspective();
+  } else if (appId === 'signs') {
+    title.textContent = "Exerciții: Semne Grafice";
+    content.innerHTML = `
+      <div class="canvas-container">
+        <canvas id="sCanvas"></canvas>
+        <div class="controls">
+          <button class="btn red" onclick="clearSigns()">Șterge tot</button>
+          <button class="btn" onclick="setSign('line')">Linie</button>
+          <button class="btn" onclick="setSign('dot')">Punct</button>
+          <input type="color" id="signColor" value="#2B5D8A" style="width:50px;height:50px;border:none;border-radius:10px">
+        </div>
+      </div>
+    `;
+    initSigns();
+  } else if (appId === 'colors') {
+    title.textContent = "Teoria Culorilor - Mixer";
+    content.innerHTML = `
+      <div class="color-grid">
+        <div class="color-swatch" style="background:#D94F2B" onclick="mix('R')">ROȘU</div>
+        <div class="color-swatch" style="background:#F2B705" onclick="mix('Y')">GALBEN</div>
+        <div class="color-swatch" style="background:#2B5D8A" onclick="mix('B')">ALBASTRU</div>
+        <div id="mixResult" class="color-swatch" style="grid-column: span 3; background:#eee; color:#333; height:200px">Rezultat Amestec</div>
+        <button class="btn red" style="grid-column: span 3" onclick="resetMix()">Golește Paharul</button>
+      </div>
+    `;
+  }
+}
+
+function closeApp() {
+  document.getElementById('appOverlay').style.display = 'none';
+  document.getElementById('appContent').innerHTML = '';
+}
+
+// PERSPECTIVE LOGIC
+let pCtx, pCanvas, vp = {x: 400, y: 300}, horizon = 300;
+function initPerspective() {
+  pCanvas = document.getElementById('pCanvas');
+  pCtx = pCanvas.getContext('2d');
+  pCanvas.width = pCanvas.offsetWidth;
+  pCanvas.height = pCanvas.offsetHeight;
+  vp.x = pCanvas.width / 2;
+  vp.y = pCanvas.height / 2;
+  horizon = vp.y;
+
+  pCanvas.addEventListener('pointermove', e => {
+    if (e.buttons === 1) {
+      const rect = pCanvas.getBoundingClientRect();
+      vp.x = e.clientX - rect.left;
+      vp.y = e.clientY - rect.top;
+      horizon = vp.y;
+      drawPersp();
+    }
+  });
+  drawPersp();
+}
+
+function drawPersp() {
+  pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+  // Orizont
+  pCtx.strokeStyle = '#2B5D8A';
+  pCtx.lineWidth = 2;
+  pCtx.beginPath();
+  pCtx.moveTo(0, horizon);
+  pCtx.lineTo(pCanvas.width, horizon);
+  pCtx.stroke();
+  
+  // Linii de fugă
+  pCtx.strokeStyle = '#ccc';
+  for(let i=0; i<pCanvas.width; i+=100) {
+    pCtx.beginPath();
+    pCtx.moveTo(i, pCanvas.height);
+    pCtx.lineTo(vp.x, vp.y);
+    pCtx.stroke();
+  }
+
+  // Punct de fugă
+  pCtx.fillStyle = 'red';
+  pCtx.beginPath();
+  pCtx.arc(vp.x, vp.y, 10, 0, Math.PI*2);
+  pCtx.fill();
+}
+
+function resetPersp() {
+  vp.x = pCanvas.width / 2;
+  vp.y = pCanvas.height / 2;
+  horizon = vp.y;
+  drawPersp();
+}
+
+// SIGNS LOGIC
+let sCtx, sCanvas, sDrawing = false, sTool = 'line';
+function initSigns() {
+  sCanvas = document.getElementById('sCanvas');
+  sCtx = sCanvas.getContext('2d');
+  sCanvas.width = sCanvas.offsetWidth;
+  sCanvas.height = sCanvas.offsetHeight;
+  sCtx.lineCap = 'round';
+  sCtx.lineWidth = 5;
+
+  sCanvas.addEventListener('pointerdown', e => {
+    sDrawing = true;
+    sCtx.beginPath();
+    const rect = sCanvas.getBoundingClientRect();
+    sCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+  });
+  sCanvas.addEventListener('pointermove', e => {
+    if (!sDrawing) return;
+    const rect = sCanvas.getBoundingClientRect();
+    sCtx.strokeStyle = document.getElementById('signColor').value;
+    sCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    sCtx.stroke();
+  });
+  window.addEventListener('pointerup', () => sDrawing = false);
+}
+function clearSigns() { sCtx.clearRect(0,0,sCanvas.width,sCanvas.height); }
+function setSign(t) { sTool = t; sCtx.lineWidth = t === 'dot' ? 20 : 5; }
+
+// COLOR MIX LOGIC
+let currentMix = {r:0, y:0, b:0};
+function mix(color) {
+  if(color === 'R') currentMix.r = 1;
+  if(color === 'Y') currentMix.y = 1;
+  if(color === 'B') currentMix.b = 1;
+  
+  const res = document.getElementById('mixResult');
+  let finalColor = '#eee';
+  let name = "Amestec";
+
+  if(currentMix.r && currentMix.y && currentMix.b) { finalColor = '#555'; name = "Gri Neutru / Terțiar"; }
+  else if(currentMix.r && currentMix.y) { finalColor = '#F27405'; name = "ORANJ (Binară)"; }
+  else if(currentMix.y && currentMix.b) { finalColor = '#3A7D44'; name = "VERDE (Binară)"; }
+  else if(currentMix.r && currentMix.b) { finalColor = '#6A0DAD'; name = "VIOLET (Binară)"; }
+  else if(currentMix.r) { finalColor = '#D94F2B'; name = "ROȘU (Primară)"; }
+  else if(currentMix.y) { finalColor = '#F2B705'; name = "GALBEN (Primară)"; }
+  else if(currentMix.b) { finalColor = '#2B5D8A'; name = "ALBASTRU (Primară)"; }
+
+  res.style.background = finalColor;
+  res.textContent = name;
+  res.style.color = (currentMix.r || currentMix.b) ? 'white' : 'black';
+}
+function resetMix() {
+  currentMix = {r:0, y:0, b:0};
+  const res = document.getElementById('mixResult');
+  res.style.background = '#eee';
+  res.textContent = "Rezultat Amestec";
+  res.style.color = '#333';
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+{
+  "V": [
+    {
+      "title": "Punctul și linia – elemente de limbaj plastic",
+      "query": "educatie plastica clasa 5 punctul linia",
+      "channel": "Școala de Arte Online",
+      "topic": "punct"
+    },
+    {
+      "title": "Culorile primare, binare, complementare",
+      "query": "culorile primare binare educatie plastica",
+      "channel": "Manualele Digitale ART",
+      "topic": "culoare"
+    },
+    {
+      "title": "Pata de culoare – tehnici acuarelă",
+      "query": "pata de culoare tehnici acuarela",
+      "channel": "Prof. Irina Cuzum",
+      "topic": "culoare"
+    }
+  ],
+  "VI": [
+    {
+      "title": "Compoziția plastică – echilibru, ritm",
+      "query": "compozitie plastica echilibru ritm clasa 6",
+      "channel": "Profesorul de Desen",
+      "topic": "compozitie"
+    },
+    {
+      "title": "Nuanțe și tonuri – degradeuri",
+      "query": "nuante tonuri educatie plastica",
+      "channel": "ART Edu",
+      "topic": "nuante"
+    },
+    {
+      "title": "Static vs dinamic – exercițiu",
+      "query": "compozitie statica dinamica",
+      "channel": "Lecții Arte Vizuale",
+      "topic": "compozitie"
+    }
+  ],
+  "VII": [
+    {
+      "title": "Perspectiva cu 1 și 2 puncte de fugă",
+      "query": "perspectiva liniara 1 punct fuga clasa 7",
+      "channel": "Arte pentru Toți",
+      "topic": "perspectiva"
+    },
+    {
+      "title": "Proporțiile corpului uman – 7 capete",
+      "query": "proportiile corpului uman canon",
+      "channel": "Prof. Doina Marian",
+      "topic": "proportii"
+    },
+    {
+      "title": "Perspectiva aeriană în peisaj",
+      "query": "perspectiva aeriana peisaj",
+      "channel": "TVR Edu",
+      "topic": "perspectiva"
+    }
+  ],
+  "VIII": [
+    {
+      "title": "Istoria artei – Egipt Grecia Roma",
+      "query": "istoria artei egipt grecia roma clasa 8",
+      "channel": "Manual Digital ART",
+      "topic": "istorie"
+    },
+    {
+      "title": "Renașterea – Leonardo Michelangelo",
+      "query": "renasterea leonardo michelangelo",
+      "channel": "Istorie prin Artă",
+      "topic": "istorie"
+    },
+    {
+      "title": "Artă modernă românească",
+      "query": "arta moderna romaneasca impresionism",
+      "channel": "EduCred",
+      "topic": "patrimoniu"
+    }
+  ],
+  "IX": [
+    {
+      "title": "Limbajul vizual – semne simboluri",
+      "query": "limbaj vizual semne simboluri clasa 9",
+      "channel": "Liceul de Arte",
+      "topic": "analiza"
+    },
+    {
+      "title": "Mijloace expresie – contrast dominanta",
+      "query": "mijloace expresie contrast dominanta",
+      "channel": "Prof. Adrian Brătescu",
+      "topic": "analiza"
+    },
+    {
+      "title": "Analiza imaginii publicitare",
+      "query": "analiza imagine publicitara educatie vizuala",
+      "channel": "Edu Vizual",
+      "topic": "comunicare"
+    }
+  ],
+  "X": [
+    {
+      "title": "Introducere în design",
+      "query": "introducere design produs grafic ambiental",
+      "channel": "Design Academy RO",
+      "topic": "design"
+    },
+    {
+      "title": "Principiile designului",
+      "query": "principiile designului forma functie",
+      "channel": "Design RO",
+      "topic": "design"
+    },
+    {
+      "title": "Design afiș – proiect practic",
+      "query": "design afis proiect practic clasa 10",
+      "channel": "Arte Vizuale",
+      "topic": "design"
+    }
+  ]
+}

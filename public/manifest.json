@@ -1,0 +1,21 @@
+{
+  "name": "Atelier de Artă - CN Roman-Vodă",
+  "short_name": "Atelier Artă",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAF7F2",
+  "theme_color": "#2B5D8A",
+  "lang": "ro",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
