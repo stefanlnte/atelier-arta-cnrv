@@ -196,7 +196,7 @@ function openApp(appId) {
     title.textContent = "Perspectivă la un punct de fugă";
     content.innerHTML = `
       <div class="canvas-container">
-        <canvas id="pCanvas" aria-label="Câmp de desen în perspectivă. Apasă pe câmp pentru a adăuga un cub."></canvas>
+        <canvas id="pCanvas" aria-label="Câmp de desen în perspectivă. Glisează punctele roșii pentru a muta punctul de fugă și orizontul; apasă pe câmp pentru a adăuga un cub."></canvas>
         <div class="controls perspective-controls" aria-label="Instrumente de perspectivă">
           <button class="btn" id="onePointBtn" type="button" onclick="setPerspectiveMode('one')" aria-pressed="true">1 punct</button>
           <button class="btn" id="twoPointBtn" type="button" onclick="setPerspectiveMode('two')" aria-pressed="false">2 puncte</button>
@@ -246,6 +246,7 @@ function closeApp() {
 // PERSPECTIVE LOGIC
 let pCtx, pCanvas, perspectiveMode = 'one', cubes = [], cubeId = 0;
 let cameraYaw = 0, cameraPitch = 24, cameraVisible = true;
+let horizonRatio = 0.43, lensShiftRatio = 0, draggingVanishingPoint = null, suppressCanvasClick = false;
 const cubePalette = ['#D94F2B', '#2B5D8A', '#3A7D44', '#B56A18'];
 
 function initPerspective() {
@@ -260,13 +261,54 @@ function initPerspective() {
   document.getElementById('cameraYaw').addEventListener('input', event => {
     cameraYaw = Number(event.target.value);
     if (perspectiveMode === 'two' && cameraYaw === 0) cameraYaw = 1;
+    if (perspectiveMode === 'one') lensShiftRatio = cameraYaw / 200;
     drawPersp();
   });
   document.getElementById('cameraPitch').addEventListener('input', event => {
     cameraPitch = Number(event.target.value);
     drawPersp();
   });
+  pCanvas.addEventListener('pointerdown', event => {
+    const rect = pCanvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const pointIndex = getVanishingPoints(rect.width, rect.height).findIndex(point => Math.hypot(point.x - x, point.y - y) <= 22);
+    if (pointIndex === -1) return;
+    draggingVanishingPoint = pointIndex;
+    suppressCanvasClick = true;
+    pCanvas.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  });
+  pCanvas.addEventListener('pointermove', event => {
+    if (draggingVanishingPoint === null) return;
+    const rect = pCanvas.getBoundingClientRect();
+    const x = Math.max(12, Math.min(rect.width - 12, event.clientX - rect.left));
+    const y = Math.max(20, Math.min(rect.height - 20, event.clientY - rect.top));
+    horizonRatio = y / rect.height;
+    if (perspectiveMode === 'one') {
+      lensShiftRatio = x / rect.width - 0.5;
+      cameraYaw = Math.round(lensShiftRatio * 200);
+      document.getElementById('cameraYaw').value = cameraYaw;
+    } else {
+      cameraYaw = Math.round((draggingVanishingPoint === 0 ? 0.5 - x / rect.width : x / rect.width - 0.5) * 100);
+      cameraYaw = Math.max(8, Math.min(65, cameraYaw));
+      document.getElementById('cameraYaw').value = cameraYaw;
+    }
+    drawPersp();
+  });
+  pCanvas.addEventListener('pointerup', () => {
+    draggingVanishingPoint = null;
+    window.setTimeout(() => { suppressCanvasClick = false; }, 0);
+  });
+  pCanvas.addEventListener('pointercancel', () => {
+    draggingVanishingPoint = null;
+    suppressCanvasClick = false;
+  });
   pCanvas.addEventListener('click', event => {
+    if (suppressCanvasClick) {
+      suppressCanvasClick = false;
+      return;
+    }
     const rect = pCanvas.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width - 0.5) * 12;
     const z = 2 + ((event.clientY - rect.top) / rect.height) * 12;
@@ -291,14 +333,15 @@ function resizePerspectiveCanvas() {
 function projectPoint(x, y, z) {
   const width = pCanvas.clientWidth;
   const height = pCanvas.clientHeight;
-  const yaw = cameraYaw * Math.PI / 180;
+  const yaw = (perspectiveMode === 'two' ? cameraYaw : 0) * Math.PI / 180;
   const pitch = cameraPitch * Math.PI / 180;
   const distance = 15;
   const horizontal = x * Math.cos(yaw) - z * Math.sin(yaw);
   const depth = Math.max(2, distance + x * Math.sin(yaw) + z * Math.cos(yaw));
   const vertical = y * Math.cos(pitch) - (depth - distance) * Math.sin(pitch);
   const focal = Math.min(width, height) * 1.25;
-  return { x: width / 2 + horizontal * focal / depth, y: height * 0.43 - vertical * focal / depth, depth };
+  const lensShift = perspectiveMode === 'one' ? lensShiftRatio * width : 0;
+  return { x: width / 2 + lensShift + horizontal * focal / depth, y: height * horizonRatio - vertical * focal / depth, depth };
 }
 
 function drawPersp() {
@@ -309,7 +352,7 @@ function drawPersp() {
   pCtx.fillStyle = '#fff';
   pCtx.fillRect(0, 0, width, height);
 
-  const horizon = height * 0.43;
+  const horizon = height * horizonRatio;
   pCtx.strokeStyle = '#2B5D8A';
   pCtx.lineWidth = 2;
   pCtx.beginPath();
@@ -336,16 +379,26 @@ function drawPersp() {
 
   cubes.slice().sort((a, b) => b.z - a.z).forEach(drawCube);
 
-  const vanishingPoints = perspectiveMode === 'one'
-    ? [{ x: width / 2, label: 'PF' }]
-    : [{ x: width * 0.12, label: 'PF₁' }, { x: width * 0.88, label: 'PF₂' }];
+  const vanishingPoints = getVanishingPoints(width, height);
   pCtx.fillStyle = '#D94F2B';
   pCtx.font = 'bold 12px Segoe UI, sans-serif';
   vanishingPoints.forEach(point => {
     pCtx.beginPath(); pCtx.arc(point.x, horizon, 6, 0, Math.PI * 2); pCtx.fill();
     pCtx.fillText(point.label, point.x + 9, horizon - 8);
   });
-  document.getElementById('perspectiveStatus').textContent = `Perspectivă cu ${perspectiveMode === 'one' ? '1 punct' : '2 puncte'} · ${cubes.length} ${cubes.length === 1 ? 'cub' : 'cuburi'}`;
+  document.getElementById('perspectiveStatus').textContent = `Perspectivă cu ${perspectiveMode === 'one' ? '1 punct' : '2 puncte'} · ${cubes.length} ${cubes.length === 1 ? 'cub' : 'cuburi'} · Trage PF pentru orizont`;
+}
+
+function getVanishingPoints(width, height) {
+  const horizon = height * horizonRatio;
+  if (perspectiveMode === 'one') {
+    return [{ x: width * (0.5 + lensShiftRatio), y: horizon, label: 'PF' }];
+  }
+  const spread = Math.min(0.42, Math.max(0.08, Math.abs(cameraYaw) / 100));
+  return [
+    { x: width * (0.5 - spread), y: horizon, label: 'PF₁' },
+    { x: width * (0.5 + spread), y: horizon, label: 'PF₂' }
+  ];
 }
 
 function drawCube(cube) {
@@ -376,6 +429,7 @@ function setPerspectiveMode(mode) {
   document.getElementById('onePointBtn').setAttribute('aria-pressed', String(mode === 'one'));
   document.getElementById('twoPointBtn').setAttribute('aria-pressed', String(mode === 'two'));
   cameraYaw = mode === 'one' ? 0 : 35;
+  lensShiftRatio = 0;
   document.getElementById('cameraYaw').value = cameraYaw;
   drawPersp();
 }
@@ -397,6 +451,8 @@ function toggleCameraControls() {
 function resetPersp() {
   cubes = [];
   cubeId = 0;
+  horizonRatio = 0.43;
+  lensShiftRatio = 0;
   setPerspectiveMode('one');
   cameraPitch = 24;
   document.getElementById('cameraPitch').value = cameraPitch;
