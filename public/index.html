@@ -102,9 +102,57 @@ canvas { width: 100%; height: 100%; display: block; }
 .btn.red { background: var(--terracotta); }
 .btn.green { background: var(--green); }
 
-/* Color Theory Grid */
-.color-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 40px; height: 100%; }
-.color-swatch { border-radius: 20px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+  /* Itten color study */
+  .color-study { width: 100%; min-height: 100%; display: flex; align-items: center; justify-content: center; overflow-y: auto; padding: clamp(24px, 5vw, 64px); background: #fbfaf7; }
+  .color-mixer { width: min(1040px, 100%); display: grid; grid-template-columns: minmax(280px, 1.1fr) minmax(300px, .9fr); align-items: center; gap: clamp(36px, 7vw, 88px); margin: auto; }
+  .color-wheel-column { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .itten-wheel { position: relative; width: min(100%, 440px); aspect-ratio: 1; border-radius: 50%; isolation: isolate; }
+  .itten-wheel::before { content: ''; position: absolute; inset: 0; border: 1px solid #e5e2dc; border-radius: 50%; transition: opacity .45s ease; }
+  .itten-wheel[data-stage="full"]::before { opacity: 0; }
+  .spectrum-ring { position: absolute; inset: 0; border: 1px solid #e5e2dc; border-radius: 50%; background: conic-gradient(from -30deg, #ffe900 0deg, #ffb900 42deg, #f27c18 76deg, #ec4b22 112deg, #e51d27 145deg, #c9007a 188deg, #77378e 226deg, #354fa0 267deg, #0784bd 304deg, #009a78 335deg, #8cbd27 360deg); opacity: 0; transform: scale(.96); transition: opacity .65s ease, transform .65s ease; }
+  .spectrum-ring::after { content: ''; position: absolute; inset: 18%; border-radius: 50%; background: #fbfaf7; }
+  .itten-wheel[data-stage="full"] .spectrum-ring { opacity: 1; transform: scale(1); }
+  .wheel-svg { position: absolute; inset: 6%; width: 88%; height: 88%; overflow: visible; }
+  .wheel-sector { stroke: #fbfaf7; stroke-width: 2.5; transition: fill .55s ease; }
+  .wheel-yellow { fill: #f2de00; }
+  .wheel-orange { fill: #f28c00; }
+  .wheel-red { fill: #e51f26; }
+  .wheel-violet { fill: #713b8c; }
+  .wheel-blue { fill: #2874ad; }
+  .wheel-green { fill: #008c62; }
+  .wheel-sector.secondary { fill: #fbfaf7; stroke: #e5e2dc; }
+  .itten-wheel[data-stage="full"] .wheel-sector.secondary { fill: var(--wheel-color); stroke: #fbfaf7; }
+  .wheel-stage-caption { color: #77736d; font-size: 12px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
+  .color-guide { display: flex; flex-direction: column; align-items: flex-start; }
+  .color-eyebrow { margin: 0 0 12px; color: #8d7952; font-size: 12px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
+  .color-guide h3 { margin: 0; color: #22221f; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(32px, 4vw, 48px); font-weight: 500; letter-spacing: -.04em; line-height: 1.05; }
+  .color-intro { max-width: 430px; margin: 16px 0 28px; color: #6c6a64; font-size: 16px; line-height: 1.65; }
+  .primary-palette { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+  .primary-chip { min-height: 42px; display: inline-flex; align-items: center; gap: 9px; padding: 8px 13px; border: 1px solid #e5e2dc; border-radius: 999px; background: #fff; color: #32312d; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: border-color .2s, box-shadow .2s, transform .2s; }
+  .primary-chip:hover { transform: translateY(-1px); border-color: #c5bfae; }
+  .primary-chip:focus-visible, .wheel-toggle:focus-visible, .mix-reset:focus-visible { outline: 3px solid #3d6b91; outline-offset: 3px; }
+  .primary-chip[aria-pressed="true"] { border-color: #8f8674; box-shadow: 0 0 0 2px rgba(141,121,82,.13); }
+  .primary-dot { width: 15px; height: 15px; flex: 0 0 auto; border-radius: 50%; background: var(--primary-color); }
+  .mix-output { min-height: 72px; width: 100%; display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid #e8e5df; border-radius: 16px; background: rgba(255,255,255,.78); }
+  .mix-output-dot { width: 38px; height: 38px; flex: 0 0 auto; border: 1px solid rgba(0,0,0,.08); border-radius: 50%; background: transparent; transition: background .3s ease; }
+  .mix-output-label { color: #5e5a53; font-size: 14px; line-height: 1.4; }
+  .color-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 18px; }
+  .wheel-toggle { min-height: 46px; padding: 0 18px; border: 0; border-radius: 12px; background: #25251f; color: #fff; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: background .2s, transform .2s; }
+  .wheel-toggle:hover { transform: translateY(-1px); background: #454239; }
+  .mix-reset { min-height: 46px; padding: 0 14px; border: 0; border-radius: 12px; background: transparent; color: #77736d; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+  .color-footnote { margin: 20px 0 0; color: #8a867e; font-size: 12px; line-height: 1.5; }
+  @media (max-width: 760px) {
+    .color-study { align-items: flex-start; padding: 28px 20px 36px; }
+    .color-mixer { grid-template-columns: 1fr; gap: 32px; max-width: 520px; }
+    .itten-wheel { width: min(86vw, 360px); }
+    .color-guide { align-items: center; text-align: center; }
+    .color-intro { margin: 12px 0 22px; }
+    .primary-palette, .color-actions { justify-content: center; }
+    .mix-output { text-align: left; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .itten-wheel::before, .spectrum-ring, .wheel-sector, .primary-chip, .wheel-toggle, .mix-output-dot { transition: none; }
+  }
 
 </style>
 </head>
@@ -165,7 +213,7 @@ canvas { width: 100%; height: 100%; display: block; }
   <div class="card app" onclick="openApp('colors')">
     <div class="icon">🌈</div>
     <h2>Teoria Culorii</h2>
-    <p>Mixer & Complementare</p>
+    <p>Roata lui Itten & Amestecuri</p>
   </div>
 </div>
 
@@ -225,16 +273,47 @@ function openApp(appId) {
     `;
     initSigns();
   } else if (appId === 'colors') {
-    title.textContent = "Teoria Culorilor - Mixer";
-    content.innerHTML = `
-      <div class="color-grid">
-        <div class="color-swatch" style="background:#D94F2B" onclick="mix('R')">ROȘU</div>
-        <div class="color-swatch" style="background:#F2B705" onclick="mix('Y')">GALBEN</div>
-        <div class="color-swatch" style="background:#2B5D8A" onclick="mix('B')">ALBASTRU</div>
-        <div id="mixResult" class="color-swatch" style="grid-column: span 3; background:#eee; color:#333; height:200px">Rezultat Amestec</div>
-        <button class="btn red" style="grid-column: span 3" onclick="resetMix()">Golește Paharul</button>
-      </div>
-    `;
+  title.textContent = "Teoria Culorilor · Roata lui Itten";
+  content.innerHTML = `
+  <div class="color-study">
+  <div class="color-mixer">
+  <div class="color-wheel-column">
+  <div id="ittenWheel" class="itten-wheel" data-stage="primaries" role="img" aria-label="Roata culorilor: la început sunt vizibile numai culorile primare">
+  <div class="spectrum-ring" aria-hidden="true"></div>
+  <svg class="wheel-svg" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
+  <path class="wheel-sector primary wheel-yellow" d="M160 160 L160 48 L257 104 Z"></path>
+  <path class="wheel-sector secondary wheel-orange" style="--wheel-color:#f28c00" d="M160 160 L257 104 L257 216 Z"></path>
+  <path class="wheel-sector primary wheel-red" d="M160 160 L257 216 L160 272 Z"></path>
+  <path class="wheel-sector secondary wheel-violet" style="--wheel-color:#713b8c" d="M160 160 L160 272 L63 216 Z"></path>
+  <path class="wheel-sector primary wheel-blue" d="M160 160 L63 216 L63 104 Z"></path>
+  <path class="wheel-sector secondary wheel-green" style="--wheel-color:#008c62" d="M160 160 L63 104 L160 48 Z"></path>
+  </svg>
+  </div>
+  <div id="wheelStageCaption" class="wheel-stage-caption">01 / Doar culorile primare</div>
+  </div>
+  <section class="color-guide" aria-labelledby="colorGuideTitle">
+  <p class="color-eyebrow">Studiu de culoare · Itten</p>
+  <h3 id="colorGuideTitle">Din primare,<br>într-o lume de nuanțe.</h3>
+  <p class="color-intro">Pornește cu roșu, galben și albastru. Alege culori pentru a le combina, apoi dezvăluie roata completă, unde fiecare nuanță se topește firesc în următoarea.</p>
+  <div class="primary-palette" role="group" aria-label="Alege culorile primare pentru amestec">
+  <button class="primary-chip" type="button" onclick="mix('R')" aria-pressed="false"><span class="primary-dot" style="--primary-color:#e51f26"></span>Roșu</button>
+  <button class="primary-chip" type="button" onclick="mix('Y')" aria-pressed="false"><span class="primary-dot" style="--primary-color:#f2de00"></span>Galben</button>
+  <button class="primary-chip" type="button" onclick="mix('B')" aria-pressed="false"><span class="primary-dot" style="--primary-color:#2874ad"></span>Albastru</button>
+  </div>
+  <div class="mix-output" aria-live="polite">
+  <span id="mixColor" class="mix-output-dot" aria-hidden="true"></span>
+  <span id="mixResult" class="mix-output-label">Alege o culoare primară pentru a începe.</span>
+  </div>
+  <div class="color-actions">
+  <button id="wheelToggleBtn" class="wheel-toggle" type="button" onclick="toggleWheelStage()" aria-pressed="false">Dezvăluie roata completă</button>
+  <button class="mix-reset" type="button" onclick="resetMix()">Resetează amestecul</button>
+  </div>
+  <p class="color-footnote">Roșu, galben și albastru sunt culori primare. Amestecurile lor dau naștere culorilor secundare și tuturor tranzițiilor dintre ele.</p>
+  </section>
+  </div>
+  </div>
+  `;
+  resetMix();
   }
 }
 
@@ -534,35 +613,49 @@ function clearSigns() { sCtx.clearRect(0,0,sCanvas.width,sCanvas.height); }
 function setSign(t) { sTool = t; sCtx.lineWidth = t === 'dot' ? 20 : 5; }
 
 // COLOR MIX LOGIC
-let currentMix = {r:0, y:0, b:0};
-function mix(color) {
-  if(color === 'R') currentMix.r = 1;
-  if(color === 'Y') currentMix.y = 1;
-  if(color === 'B') currentMix.b = 1;
+  let currentMix = {r:0, y:0, b:0};
+  function mix(color) {
+  if (color === 'R') currentMix.r = 1;
+  if (color === 'Y') currentMix.y = 1;
+  if (color === 'B') currentMix.b = 1;
   
-  const res = document.getElementById('mixResult');
   let finalColor = '#eee';
-  let name = "Amestec";
+  let name = 'Amestec';
+  if (currentMix.r && currentMix.y && currentMix.b) { finalColor = '#77736d'; name = 'Roșu + galben + albastru · ton neutru'; }
+  else if (currentMix.r && currentMix.y) { finalColor = '#f28c00'; name = 'Roșu + galben = oranj'; }
+  else if (currentMix.y && currentMix.b) { finalColor = '#008c62'; name = 'Galben + albastru = verde'; }
+  else if (currentMix.r && currentMix.b) { finalColor = '#713b8c'; name = 'Roșu + albastru = violet'; }
+  else if (currentMix.r) { finalColor = '#e51f26'; name = 'Roșu · culoare primară'; }
+  else if (currentMix.y) { finalColor = '#f2de00'; name = 'Galben · culoare primară'; }
+  else if (currentMix.b) { finalColor = '#2874ad'; name = 'Albastru · culoare primară'; }
 
-  if(currentMix.r && currentMix.y && currentMix.b) { finalColor = '#555'; name = "Gri Neutru / Terțiar"; }
-  else if(currentMix.r && currentMix.y) { finalColor = '#F27405'; name = "ORANJ (Binară)"; }
-  else if(currentMix.y && currentMix.b) { finalColor = '#3A7D44'; name = "VERDE (Binară)"; }
-  else if(currentMix.r && currentMix.b) { finalColor = '#6A0DAD'; name = "VIOLET (Binară)"; }
-  else if(currentMix.r) { finalColor = '#D94F2B'; name = "ROȘU (Primară)"; }
-  else if(currentMix.y) { finalColor = '#F2B705'; name = "GALBEN (Primară)"; }
-  else if(currentMix.b) { finalColor = '#2B5D8A'; name = "ALBASTRU (Primară)"; }
-
-  res.style.background = finalColor;
-  res.textContent = name;
-  res.style.color = (currentMix.r || currentMix.b) ? 'white' : 'black';
-}
-function resetMix() {
+  document.getElementById('mixColor').style.background = finalColor;
+  document.getElementById('mixResult').textContent = name;
+  document.querySelectorAll('.primary-chip').forEach((button, index) => {
+  const selected = [currentMix.r, currentMix.y, currentMix.b][index] === 1;
+  button.setAttribute('aria-pressed', String(selected));
+  });
+  }
+  function resetMix() {
   currentMix = {r:0, y:0, b:0};
-  const res = document.getElementById('mixResult');
-  res.style.background = '#eee';
-  res.textContent = "Rezultat Amestec";
-  res.style.color = '#333';
-}
+  document.getElementById('mixColor').style.background = 'transparent';
+  document.getElementById('mixResult').textContent = 'Alege o culoare primară pentru a începe.';
+  document.querySelectorAll('.primary-chip').forEach(button => button.setAttribute('aria-pressed', 'false'));
+  }
+  function toggleWheelStage() {
+  const wheel = document.getElementById('ittenWheel');
+  const showFullWheel = wheel.dataset.stage !== 'full';
+  wheel.dataset.stage = showFullWheel ? 'full' : 'primaries';
+  wheel.setAttribute('aria-label', showFullWheel
+  ? 'Roata completă a culorilor lui Itten, cu tranziții line între nuanțe'
+  : 'Roata culorilor: la început sunt vizibile numai culorile primare');
+  document.getElementById('wheelStageCaption').textContent = showFullWheel
+  ? '02 / Amestecuri și tranziții'
+  : '01 / Doar culorile primare';
+  const button = document.getElementById('wheelToggleBtn');
+  button.setAttribute('aria-pressed', String(showFullWheel));
+  button.textContent = showFullWheel ? 'Arată doar culorile primare' : 'Dezvăluie roata completă';
+  }
 
 </script>
 </body>
