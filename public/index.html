@@ -113,7 +113,12 @@ canvas { width: 100%; height: 100%; display: block; }
   .spectrum-ring::after { content: ''; position: absolute; inset: 18%; border-radius: 50%; background: #fbfaf7; }
   .itten-wheel[data-stage="full"] .spectrum-ring { opacity: 1; transform: scale(1); }
   .wheel-svg { position: absolute; inset: 6%; width: 88%; height: 88%; overflow: visible; }
-  .wheel-sector { stroke: #fbfaf7; stroke-width: 2.5; transition: fill .55s ease; }
+  .wheel-sector { stroke: #fbfaf7; stroke-width: 2.5; cursor: pointer; transition: fill .55s ease, stroke-width .2s ease; }
+  .wheel-sector:focus { outline: none; }
+  .wheel-sector:focus-visible { outline: none; stroke: #25251f; stroke-width: 4; }
+  .wheel-sector[aria-pressed="true"] { stroke: #25251f; stroke-width: 4; }
+  .spectrum-ring { cursor: pointer; }
+  .spectrum-ring:focus-visible { outline: 3px solid #3d6b91; outline-offset: 5px; }
   .wheel-yellow { fill: #f2de00; }
   .wheel-orange { fill: #f28c00; }
   .wheel-red { fill: #e51f26; }
@@ -127,19 +132,9 @@ canvas { width: 100%; height: 100%; display: block; }
   .color-eyebrow { margin: 0 0 12px; color: #8d7952; font-size: 12px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
   .color-guide h3 { margin: 0; color: #22221f; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(32px, 4vw, 48px); font-weight: 500; letter-spacing: -.04em; line-height: 1.05; }
   .color-intro { max-width: 430px; margin: 16px 0 28px; color: #6c6a64; font-size: 16px; line-height: 1.65; }
-  .primary-palette { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
-  .primary-chip { min-height: 42px; display: inline-flex; align-items: center; gap: 9px; padding: 8px 13px; border: 1px solid #e5e2dc; border-radius: 999px; background: #fff; color: #32312d; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: border-color .2s, box-shadow .2s, transform .2s; }
-  .primary-chip:hover { transform: translateY(-1px); border-color: #c5bfae; }
-  .primary-chip:focus-visible, .wheel-toggle:focus-visible, .mix-reset:focus-visible { outline: 3px solid #3d6b91; outline-offset: 3px; }
-  .primary-chip[aria-pressed="true"] { border-color: #8f8674; box-shadow: 0 0 0 2px rgba(141,121,82,.13); }
-  .primary-dot { width: 15px; height: 15px; flex: 0 0 auto; border-radius: 50%; background: var(--primary-color); }
   .mix-output { min-height: 72px; width: 100%; display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid #e8e5df; border-radius: 16px; background: rgba(255,255,255,.78); }
   .mix-output-dot { width: 38px; height: 38px; flex: 0 0 auto; border: 1px solid rgba(0,0,0,.08); border-radius: 50%; background: transparent; transition: background .3s ease; }
   .mix-output-label { color: #5e5a53; font-size: 14px; line-height: 1.4; }
-  .color-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 18px; }
-  .wheel-toggle { min-height: 46px; padding: 0 18px; border: 0; border-radius: 12px; background: #25251f; color: #fff; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: background .2s, transform .2s; }
-  .wheel-toggle:hover { transform: translateY(-1px); background: #454239; }
-  .mix-reset { min-height: 46px; padding: 0 14px; border: 0; border-radius: 12px; background: transparent; color: #77736d; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
   .color-footnote { margin: 20px 0 0; color: #8a867e; font-size: 12px; line-height: 1.5; }
   @media (max-width: 760px) {
     .color-study { align-items: flex-start; padding: 28px 20px 36px; }
@@ -147,11 +142,10 @@ canvas { width: 100%; height: 100%; display: block; }
     .itten-wheel { width: min(86vw, 360px); }
     .color-guide { align-items: center; text-align: center; }
     .color-intro { margin: 12px 0 22px; }
-    .primary-palette, .color-actions { justify-content: center; }
     .mix-output { text-align: left; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .itten-wheel::before, .spectrum-ring, .wheel-sector, .primary-chip, .wheel-toggle, .mix-output-dot { transition: none; }
+    .itten-wheel::before, .spectrum-ring, .wheel-sector, .mix-output-dot { transition: none; }
   }
 
 </style>
@@ -278,15 +272,15 @@ function openApp(appId) {
   <div class="color-study">
   <div class="color-mixer">
   <div class="color-wheel-column">
-  <div id="ittenWheel" class="itten-wheel" data-stage="primaries" role="img" aria-label="Roata culorilor: la început sunt vizibile numai culorile primare">
-  <div class="spectrum-ring" aria-hidden="true"></div>
-  <svg class="wheel-svg" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
-  <path class="wheel-sector primary wheel-yellow" d="M160 160 L160 48 L257 104 Z"></path>
-  <path class="wheel-sector secondary wheel-orange" style="--wheel-color:#f28c00" d="M160 160 L257 104 L257 216 Z"></path>
-  <path class="wheel-sector primary wheel-red" d="M160 160 L257 216 L160 272 Z"></path>
-  <path class="wheel-sector secondary wheel-violet" style="--wheel-color:#713b8c" d="M160 160 L160 272 L63 216 Z"></path>
-  <path class="wheel-sector primary wheel-blue" d="M160 160 L63 216 L63 104 Z"></path>
-  <path class="wheel-sector secondary wheel-green" style="--wheel-color:#008c62" d="M160 160 L63 104 L160 48 Z"></path>
+  <div id="ittenWheel" class="itten-wheel" data-stage="primaries" role="group" aria-label="Roata interactivă a culorilor lui Itten">
+  <div class="spectrum-ring" role="button" tabindex="0" aria-label="Dezvăluie roata completă" onclick="toggleWheelStage()" onkeydown="handleRingKey(event)" aria-pressed="false"></div>
+  <svg class="wheel-svg" viewBox="0 0 320 320" role="group" aria-label="Culori primare și secundare">
+  <path class="wheel-sector primary wheel-yellow" data-primary="Y" role="button" tabindex="0" aria-label="Galben, culoare primară" aria-pressed="false" onclick="mix('Y')" onkeydown="handlePrimaryKey(event, 'Y')" d="M160 160 L160 48 L257 104 Z"></path>
+  <path class="wheel-sector secondary wheel-orange" data-blend="orange" role="button" tabindex="0" aria-label="Oranj, amestec de roșu și galben" onclick="showWheelBlend('orange')" onkeydown="handleBlendKey(event, 'orange')" style="--wheel-color:#f28c00" d="M160 160 L257 104 L257 216 Z"></path>
+  <path class="wheel-sector primary wheel-red" data-primary="R" role="button" tabindex="0" aria-label="Roșu, culoare primară" aria-pressed="false" onclick="mix('R')" onkeydown="handlePrimaryKey(event, 'R')" d="M160 160 L257 216 L160 272 Z"></path>
+  <path class="wheel-sector secondary wheel-violet" data-blend="violet" role="button" tabindex="0" aria-label="Violet, amestec de roșu și albastru" onclick="showWheelBlend('violet')" onkeydown="handleBlendKey(event, 'violet')" style="--wheel-color:#713b8c" d="M160 160 L160 272 L63 216 Z"></path>
+  <path class="wheel-sector primary wheel-blue" data-primary="B" role="button" tabindex="0" aria-label="Albastru, culoare primară" aria-pressed="false" onclick="mix('B')" onkeydown="handlePrimaryKey(event, 'B')" d="M160 160 L63 216 L63 104 Z"></path>
+  <path class="wheel-sector secondary wheel-green" data-blend="green" role="button" tabindex="0" aria-label="Verde, amestec de galben și albastru" onclick="showWheelBlend('green')" onkeydown="handleBlendKey(event, 'green')" style="--wheel-color:#008c62" d="M160 160 L63 104 L160 48 Z"></path>
   </svg>
   </div>
   <div id="wheelStageCaption" class="wheel-stage-caption">01 / Doar culorile primare</div>
@@ -294,19 +288,10 @@ function openApp(appId) {
   <section class="color-guide" aria-labelledby="colorGuideTitle">
   <p class="color-eyebrow">Studiu de culoare · Itten</p>
   <h3 id="colorGuideTitle">Din primare,<br>într-o lume de nuanțe.</h3>
-  <p class="color-intro">Pornește cu roșu, galben și albastru. Alege culori pentru a le combina, apoi dezvăluie roata completă, unde fiecare nuanță se topește firesc în următoarea.</p>
-  <div class="primary-palette" role="group" aria-label="Alege culorile primare pentru amestec">
-  <button class="primary-chip" type="button" onclick="mix('R')" aria-pressed="false"><span class="primary-dot" style="--primary-color:#e51f26"></span>Roșu</button>
-  <button class="primary-chip" type="button" onclick="mix('Y')" aria-pressed="false"><span class="primary-dot" style="--primary-color:#f2de00"></span>Galben</button>
-  <button class="primary-chip" type="button" onclick="mix('B')" aria-pressed="false"><span class="primary-dot" style="--primary-color:#2874ad"></span>Albastru</button>
-  </div>
+  <p class="color-intro">Atinge culorile primare pentru a le combina. Selectează din nou o culoare pentru a o scoate din amestec. Atinge un sector deschis sau inelul pentru a explora roata completă.</p>
   <div class="mix-output" aria-live="polite">
   <span id="mixColor" class="mix-output-dot" aria-hidden="true"></span>
-  <span id="mixResult" class="mix-output-label">Alege o culoare primară pentru a începe.</span>
-  </div>
-  <div class="color-actions">
-  <button id="wheelToggleBtn" class="wheel-toggle" type="button" onclick="toggleWheelStage()" aria-pressed="false">Dezvăluie roata completă</button>
-  <button class="mix-reset" type="button" onclick="resetMix()">Resetează amestecul</button>
+  <span id="mixResult" class="mix-output-label">Atinge o culoare primară pentru a începe.</span>
   </div>
   <p class="color-footnote">Roșu, galben și albastru sunt culori primare. Amestecurile lor dau naștere culorilor secundare și tuturor tranzițiilor dintre ele.</p>
   </section>
@@ -613,49 +598,103 @@ function clearSigns() { sCtx.clearRect(0,0,sCanvas.width,sCanvas.height); }
 function setSign(t) { sTool = t; sCtx.lineWidth = t === 'dot' ? 20 : 5; }
 
 // COLOR MIX LOGIC
-  let currentMix = {r:0, y:0, b:0};
-  function mix(color) {
-  if (color === 'R') currentMix.r = 1;
-  if (color === 'Y') currentMix.y = 1;
-  if (color === 'B') currentMix.b = 1;
-  
-  let finalColor = '#eee';
-  let name = 'Amestec';
-  if (currentMix.r && currentMix.y && currentMix.b) { finalColor = '#77736d'; name = 'Roșu + galben + albastru · ton neutru'; }
-  else if (currentMix.r && currentMix.y) { finalColor = '#f28c00'; name = 'Roșu + galben = oranj'; }
-  else if (currentMix.y && currentMix.b) { finalColor = '#008c62'; name = 'Galben + albastru = verde'; }
-  else if (currentMix.r && currentMix.b) { finalColor = '#713b8c'; name = 'Roșu + albastru = violet'; }
-  else if (currentMix.r) { finalColor = '#e51f26'; name = 'Roșu · culoare primară'; }
-  else if (currentMix.y) { finalColor = '#f2de00'; name = 'Galben · culoare primară'; }
-  else if (currentMix.b) { finalColor = '#2874ad'; name = 'Albastru · culoare primară'; }
+let currentMix = { r: 0, y: 0, b: 0 };
+
+function renderMix() {
+  let finalColor = 'transparent';
+  let name = 'Atinge o culoare primară pentru a începe.';
+
+  if (currentMix.r && currentMix.y && currentMix.b) {
+    finalColor = '#77736d';
+    name = 'Roșu + galben + albastru · ton neutru';
+  } else if (currentMix.r && currentMix.y) {
+    finalColor = '#f28c00';
+    name = 'Roșu + galben = oranj';
+  } else if (currentMix.y && currentMix.b) {
+    finalColor = '#008c62';
+    name = 'Galben + albastru = verde';
+  } else if (currentMix.r && currentMix.b) {
+    finalColor = '#713b8c';
+    name = 'Roșu + albastru = violet';
+  } else if (currentMix.r) {
+    finalColor = '#e51f26';
+    name = 'Roșu · culoare primară';
+  } else if (currentMix.y) {
+    finalColor = '#f2de00';
+    name = 'Galben · culoare primară';
+  } else if (currentMix.b) {
+    finalColor = '#2874ad';
+    name = 'Albastru · culoare primară';
+  }
 
   document.getElementById('mixColor').style.background = finalColor;
   document.getElementById('mixResult').textContent = name;
-  document.querySelectorAll('.primary-chip').forEach((button, index) => {
-  const selected = [currentMix.r, currentMix.y, currentMix.b][index] === 1;
-  button.setAttribute('aria-pressed', String(selected));
+  document.querySelectorAll('[data-primary]').forEach((sector) => {
+    const colorKey = { R: 'r', Y: 'y', B: 'b' }[sector.dataset.primary];
+    sector.setAttribute('aria-pressed', String(Boolean(currentMix[colorKey])));
   });
-  }
-  function resetMix() {
-  currentMix = {r:0, y:0, b:0};
-  document.getElementById('mixColor').style.background = 'transparent';
-  document.getElementById('mixResult').textContent = 'Alege o culoare primară pentru a începe.';
-  document.querySelectorAll('.primary-chip').forEach(button => button.setAttribute('aria-pressed', 'false'));
-  }
-  function toggleWheelStage() {
+}
+
+function mix(color) {
+  const colorKey = { R: 'r', Y: 'y', B: 'b' }[color];
+  currentMix[colorKey] = currentMix[colorKey] ? 0 : 1;
+  renderMix();
+}
+
+function resetMix() {
+  currentMix = { r: 0, y: 0, b: 0 };
+  renderMix();
+}
+
+function showWheelBlend(blend) {
+  const blends = {
+    orange: { r: 1, y: 1, b: 0 },
+    violet: { r: 1, y: 0, b: 1 },
+    green: { r: 0, y: 1, b: 1 },
+  };
+  currentMix = blends[blend];
+  setWheelStage(true);
+  renderMix();
+}
+
+function setWheelStage(showFullWheel) {
   const wheel = document.getElementById('ittenWheel');
-  const showFullWheel = wheel.dataset.stage !== 'full';
+  const ring = wheel.querySelector('.spectrum-ring');
   wheel.dataset.stage = showFullWheel ? 'full' : 'primaries';
-  wheel.setAttribute('aria-label', showFullWheel
-  ? 'Roata completă a culorilor lui Itten, cu tranziții line între nuanțe'
-  : 'Roata culorilor: la început sunt vizibile numai culorile primare');
   document.getElementById('wheelStageCaption').textContent = showFullWheel
-  ? '02 / Amestecuri și tranziții'
-  : '01 / Doar culorile primare';
-  const button = document.getElementById('wheelToggleBtn');
-  button.setAttribute('aria-pressed', String(showFullWheel));
-  button.textContent = showFullWheel ? 'Arată doar culorile primare' : 'Dezvăluie roata completă';
+    ? '02 / Amestecuri și tranziții'
+    : '01 / Doar culorile primare';
+  ring.setAttribute('aria-pressed', String(showFullWheel));
+  ring.setAttribute('aria-label', showFullWheel
+    ? 'Revino la culorile primare'
+    : 'Dezvăluie roata completă');
+}
+
+function toggleWheelStage() {
+  setWheelStage(document.getElementById('ittenWheel').dataset.stage !== 'full');
+}
+
+function handleRingKey(event) {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    toggleWheelStage();
   }
+}
+
+function handlePrimaryKey(event, color) {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    mix(color);
+  }
+}
+
+function handleBlendKey(event, blend) {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    showWheelBlend(blend);
+  }
+}
+
 
 </script>
 </body>
